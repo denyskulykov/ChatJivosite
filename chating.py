@@ -72,17 +72,18 @@ with open(output_file, 'w', ) as csv_file:
 
             record = (client_name, date_message, text_messages, forward_link)
             writer.writerow(dict(zip(
-                headers, [unicode(s).encode("cp1251") for s in record])))
+                headers, record)))
+            # headers, [unicode(s).encode("cp1251") for s in record])))
 
             count_record += 1
         except Exception as er:
             count_error_record += 1
-            print er
+            print(er)
             continue
 
-print 'Number of Messages: {}'.format(len(list_messages))
-print 'Success: {}'.format(count_record)
-print 'Error: {}'.format(count_error_record)
+print('Number of Messages: {}'.format(len(list_messages)))
+print('Success: {}'.format(count_record))
+print('Error: {}'.format(count_error_record))
 
 
 # mails = [i.get_attribute('value') for i in driver.find_elements_by_xpath('//input') if i.get_attribute('value').count('@') > 0]
