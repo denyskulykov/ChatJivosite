@@ -101,8 +101,9 @@ try:
                 sleep(1)
 
 except:
+    raise
+finally:
     print('Execute time {}'.format(time() - start_time))
     print('Number of Messages: {}'.format(count_messages))
     print('Success: {}'.format(count_record))
     print('Error: {}'.format(count_error_record))
-    raise
