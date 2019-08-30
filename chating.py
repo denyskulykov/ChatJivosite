@@ -9,8 +9,6 @@ time_for_select_period = 1  # sec
 add_messages = 1  # 1 or 0
 len_message = 500
 
-display_browser = 1  # 1 or 0
-
 # ----------------------------------------
 
 import csv
@@ -24,10 +22,8 @@ with open(output_file, 'w'):
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--incognito")
-if not display_browser:
-    chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(chrome_options=chrome_options)
-driver.implicitly_wait(5)
+driver.implicitly_wait(10)
 driver.maximize_window()
 
 URL_PATH = 'https://app.jivosite.com/chat/archive'
@@ -118,7 +114,7 @@ try:
 except BaseException:
     raise
 finally:
-    print('Execute time {}'.format(time() - start_time))
+    print('Execute time: {} seconds'.format(int(time() - start_time)))
     print('Number of Messages: {}'.format(count_messages))
     print('Success: {}'.format(count_record))
     print('Error: {}'.format(count_error_record))
