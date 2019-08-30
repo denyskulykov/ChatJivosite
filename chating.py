@@ -9,6 +9,8 @@ time_for_select_period = 1  # sec
 add_messages = 1  # 1 or 0
 len_message = 500
 
+display_browser = 1  # 1 or 0
+
 # ----------------------------------------
 
 import csv
@@ -16,10 +18,16 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from time import sleep, time
 
+# checking file
+with open(output_file, 'w'):
+    pass
+
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--incognito")
+if not display_browser:
+    chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(chrome_options=chrome_options)
-driver.implicitly_wait(10)
+driver.implicitly_wait(5)
 driver.maximize_window()
 
 URL_PATH = 'https://app.jivosite.com/chat/archive'
@@ -54,7 +62,7 @@ count_error_record = 0
 headers = ('Name', 'Data', 'Messages', 'Source')
 
 try:
-    with open(output_file, 'w', ) as csv_file:
+    with open(output_file, 'w') as csv_file:
         writer = csv.DictWriter(csv_file,
                                 fieldnames=headers,
                                 delimiter=delimiter,
@@ -67,40 +75,47 @@ try:
 
                 client_name = driver.find_element_by_class_name('nameText__svL1B').text
 
-                date_message = driver.find_element_by_class_name(
-                    'text__UHzKN').text
+                try:
+                    date_message = driver.find_element_by_class_name(
+                        'text__UHzKN').text
+                except BaseException as er:
+                    date_message = '(empty)'
 
-                forward_link = '(empty)'
                 try:
                     forward_link = driver.find_element_by_class_name(
                         'capitalize__aHjHM').text
-                except Exception as er:
-                    pass
+                except BaseException as er:
+                    forward_link = '(empty)'
 
                 # so long - debug
-                text_messages = 'skip'
-                if add_messages:
-                    text_messages = driver.find_element_by_class_name(
-                        'msgList__3xKsJ').text.replace('\n', ' / ')
-                    text_messages = text_messages if len(
-                        text_messages) < len_message else text_messages[:len_message]
+                try:
+                    if add_messages:
+                        text_messages = driver.find_element_by_class_name(
+                            'msgList__3xKsJ').text.replace('\n', ' / ')
+                        text_messages = text_messages if \
+                            len(text_messages) < len_message \
+                            else text_messages[:len_message]
+                    else:
+                        text_messages = 'skip'
+                except BaseException as er:
+                    text_messages = 'empty'
 
                 record = (client_name, date_message, text_messages, forward_link)
-                writer.writerow(dict(zip(
-                    headers, record)))
-                # headers, [unicode(s).encode("cp1251") for s in record])))
+                temp = [s.encode("cp1251", "replace") for s in record]
+                record = [s.decode("cp1251") for s in temp]
+                writer.writerow(dict(zip(headers, record)))
 
                 count_record += 1
-            except Exception as er:
+            except BaseException as er:
                 count_error_record += 1
                 print(er)
                 continue
             finally:
-                driver.find_element_by_xpath('//*[@id="ArchiveList"]').send_keys(
-                    Keys.CONTROL + Keys.DOWN)
+                driver.find_element_by_xpath('//*[@id="ArchiveList"]')\
+                    .send_keys(Keys.CONTROL + Keys.DOWN)
                 sleep(1)
 
-except:
+except BaseException:
     raise
 finally:
     print('Execute time {}'.format(time() - start_time))
