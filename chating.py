@@ -32,9 +32,12 @@ ARCHIVE_PATH = 'https://app.jivosite.com/chat/archive'
 driver.get(ARCHIVE_PATH)
 
 # login
-driver.find_element_by_class_name('email__10Pt5 ').send_keys(login)
-driver.find_element_by_class_name('password__2wrme ').send_keys(password)
-driver.find_element_by_class_name('password__2wrme ').send_keys(Keys.ENTER)
+driver.find_elements_by_xpath('//input')[2].send_keys(login)
+# driver.find_element_by_class_name('email__2P1Oe').send_keys(login)
+driver.find_elements_by_xpath('//input')[3].send_keys(password)
+driver.find_elements_by_xpath('//input')[3].send_keys(Keys.ENTER)
+# driver.find_element_by_class_name('').send_keys(password)
+# driver.find_element_by_class_name('').send_keys(Keys.ENTER)
 sleep(2)
 
 
@@ -58,7 +61,7 @@ count_error_record = 0
 headers = ('Name', 'Data', 'Messages', 'Source')
 
 try:
-    with open(output_file, 'w') as csv_file:
+    with open(output_file, 'w', encoding='cp1251') as csv_file:
         writer = csv.DictWriter(csv_file,
                                 fieldnames=headers,
                                 delimiter=delimiter,
@@ -69,17 +72,17 @@ try:
         for _ in range(count_messages):
             try:
 
-                client_name = driver.find_element_by_class_name('nameText__svL1B').text
+                client_name = driver.find_element_by_class_name('nameText__3qMGq').text
 
                 try:
                     date_message = driver.find_element_by_class_name(
-                        'text__UHzKN').text
+                        'text__3Cahs').text
                 except BaseException as er:
                     date_message = '(empty)'
 
                 try:
                     forward_link = driver.find_element_by_class_name(
-                        'capitalize__aHjHM').text
+                        'capitalize__1ruF-').text
                 except BaseException as er:
                     forward_link = '(empty)'
 
